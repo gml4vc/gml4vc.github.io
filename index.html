@@ -1,0 +1,773 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="CVPR Tutorial on Graph Machine Learning for Visual Computing">
+  <meta name="author" content="Guocheng Qian">
+  <title>GML4VC</title>
+  <link rel="icon" href="https://cvpr2022.thecvf.com/images/sponsors/cvf_.jpg">
+
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom Google Web Font -->
+  <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link
+    href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic'
+    rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Arvo:400,700' rel='stylesheet' type='text/css'>
+
+  <!-- Custom CSS-->
+  <link href="css/general.css" rel="stylesheet">
+
+  <!-- Owl-Carousel -->
+  <link href="css/custom.css" rel="stylesheet">
+  <link href="css/owl.carousel.css" rel="stylesheet">
+  <link href="css/owl.theme.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/animate.css" rel="stylesheet">
+
+  <!-- Magnific Popup core CSS file -->
+  <link rel="stylesheet" href="css/magnific-popup.css">
+  <script src="js/vue.js"></script>
+  <script src="js/modernizr-2.8.3.min.js"></script> <!-- Modernizr /-->
+</head>
+
+
+
+
+<body>
+ <!-- javascipt for random graph generation, reference: http://bl.ocks.org/erkal/9746513 -->
+  <style>
+  .link {stroke: black;}
+  .node {stroke: white; stroke-width: 3px;}
+  </style>
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script>
+  var width = screen.width, height = screen.height, colors = d3.scale.category10();
+
+  var n = 100, // number of nodes
+      m = 80, // number of links
+      charge = -1000;
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .style("background-color", "#3498db")
+      .on("mousedown", create);
+
+  create();
+
+  function create () {
+    svg.selectAll(".link, .node").remove();
+    randomGraph(n, m, charge);
+  }
+
+  function randomGraph (n, m, charge) { //creates a random graph on n nodes and m links
+    var nodes = d3.range(n).map(Object),
+        list  = randomChoose(unorderedPairs(d3.range(n)), m),
+        links = list.map(function (a) { return {source: a[0], target: a[1]} });
+
+    var force = d3.layout.force()
+        .size([width, height])
+        .nodes(nodes)
+        .links(links)
+        .charge(charge)
+        .on("tick", tick)
+        .start();
+
+    var svgLinks = svg.selectAll(".link").data(links)
+      .enter().append("line")
+        .attr("class", "link");
+
+    var svgNodes = svg.selectAll(".node").data(nodes)
+      .enter().append("circle")
+        .attr("class", "node")
+        .attr("r", 3)
+        .style("fill", "white");
+
+    svgNodes.transition().duration(800)
+        .attr("r", function (d) { return 3 + 3 * d.weight })
+        .style("fill", function (d) { return colors(d.weight) });
+
+    svgLinks.transition().duration(800)
+        .style("stroke-width", 3);
+
+    function tick () {
+      svgNodes
+          .attr("cx", function(d) { return d.x })
+          .attr("cy", function(d) { return d.y });
+
+      svgLinks
+          .attr("x1", function(d) { return d.source.x })
+          .attr("y1", function(d) { return d.source.y })
+          .attr("x2", function(d) { return d.target.x })
+          .attr("y2", function(d) { return d.target.y });
+    }
+  }
+
+  function randomChoose (s, k) { // returns a random k element subset of s
+    var a = [], i = -1, j;
+    while (++i < k) {
+      j = Math.floor(Math.random() * s.length);
+      a.push(s.splice(j, 1)[0]);
+    };
+    return a;
+  }
+
+  function unorderedPairs (s) { // returns the list of all unordered pairs from s
+    var i = -1, a = [], j;
+    while (++i < s.length) {
+      j = i;
+      while (++j < s.length) a.push([s[i],s[j]])
+    };
+    return a;
+  }
+
+  </script>
+
+  <!-- Preloader -->
+  <div id="preloader">
+    <div id="status"></div>
+  </div>
+
+  <!-- FullScreen -->
+  <div class="intro-header">
+    <div class="col-xs-12 text-center abcen1">
+      <h1 class="h1_home wow fadeIn" data-wow-delay="0.4s"
+        style="text-shadow: 0px 8px 4px black, 0 0 25px black;font-weight: 400;font-size: 60px">
+        Graph Machine Learning for Visual Computing
+        <p></p>
+        CVPR 2022 Tutorial
+      </h1>
+      <br>
+      <br>
+      <h3 class="h3_home wow fadeIn" data-wow-delay="0.6s"
+        style="text-shadow: 0px 8px 4px black, 0 0 25px black;font-weight: 600">
+        <a style="color:white;text-shadow: 0px 8px 4px black, 0 0 25px black">
+          Time: <b>&nbsp; June 20<sup>th</sup></b>
+          <p></p>
+        </a>
+        <a style="color:white;text-shadow: 0px 8px 4px black, 0 0 25px black">
+          Hybrid Event
+          <p></p>
+          New Orleans, Louisiana, USA
+          <p></p>
+          <a style="color:rgb(0, 255, 42);text-shadow: 0px 8px 4px black, 0 0 25px black"
+            href="https://zoom.us" href="" target="_blank">
+            <b>&nbsp;Zoom Link</b>
+          </a>
+        </a>
+      </h3>
+    </div>
+
+    <!-- /.container -->
+    <div class="col-xs-12 text-center abcen wow fadeIn">
+      <div class="button_down ">
+        <a class="imgcircle wow bounceInUp" data-wow-duration="1.5s" href="#scope"> <img class="img_scroll"
+            src="img/icon/circle.png" alt=""> </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NavBar-->
+  <nav class="navbar-default" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#home">GML4VC CVPR2022</a>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
+        <ul class="nav navbar-nav">
+
+          <li class="menuItem"><a href="#scope">Home</a></li>
+          <li class="menuItem"><a href="#schedule">Schedule</a></li>
+          <li class="menuItem"><a href="#speakers">Speakers</a></li>
+          <li class="menuItem"><a href="#organizers">Organizers</a></li>
+          <li class="menuItem"><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Scope -->
+  <div id="scope" class="content-section-a" style="border-top: 0">
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-sm-6 pull-right wow fadeInRightBig">
+          <img class="img-responsive " src="img/ipad.png" alt="">
+        </div>
+        <!-- <a href='http://cvpr2021.thecvf.com/program'>
+          <img class="img-responsive" style="width: 20vw" src="img/cvpr_logo.png" alt="">
+        </a> -->
+        <div class="wow fadeInRightBig" data-animation-delay="200">
+          <h3 class="section-heading" style="text-align:justify;color:#164FC9">
+            Graph Machine Learning for Visual Computing Tutorial @ CVPR 2022</h3>
+          <p class="lead" style="text-align:justify">
+            Advances in convolutional neural networks and recurrent neural networks have led to significant improvements
+            in learning on regular grid data domains such as images and texts. However, many real-world datasets or
+            underlying relations do not lie in such simple grid structures. Such data is irregular or non-Euclidean in
+            structure and has complex relational information. Graph Machine Learning, especially Graph Neural Networks
+            (GNNs), provides a potential for processing such irregular data and being capable of modeling the relation
+            between entities, which is leading the machine learning field to a new era. Numerous data formats in the
+            visual computing area such as point clouds, 3D meshes, scene graphs, etc. have such complex structures,
+            which makes it challenging to model their representation for machine learning tasks. Graph Machine Learning
+            presents powerful tools to approach the representation learning problem. Recent works have successfully
+            applied Graph Machine Learning to handle various problems in the visual computing area such as geometric
+            processing, scene graph generation, video understanding, multi-object relational mining, physical reasoning
+            from vision, graphics simulation, visual navigation and so on. To spark more interests and creative
+            thoughts, we believe it is important and beneficial to further spread the knowledge of Graph Machine
+            Learning to the computer vision community. To this end, we organize a half-day tutorial
+            focusing on Graph Machine Learning for Visual Computing. The tutorial would cover a wide variety of topics
+            that involve the core theory of graph machine learning, its applications in visual computing, and the
+            introduction to one of the most popular graph ML programming frameworks. 
+            <!-- The list of topics of GML4VC
+            (CVPR21 Tutorial):
+            <li>Geometric Deep Learning</li>
+            <li>3D Vision</li>
+            <li>Video Understanding</li>
+            <li>Pytorch Geometric</li>
+            <li>Physical Reasoning</li>
+            <li>Robot Perception</li> -->
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- schedule -->
+  <div id="schedule" class="content-section-a">
+    <div class="container">
+      <div class="wow fadeInRightBig" data-animation-delay="200">
+        <h3 class="section-heading" style='text-align: justify;color:#164FC9'>Schedule</h3>
+        <div id="controller">
+          <div id='row fadeInRightBig'>
+            <div class="title">
+              <span v-for="(item,index) of country" :class="currentCountry == index ? 'titleItemSelect' : 'titleItem'"
+                @click="changeIndex(index)">
+                {{item}}
+              </span>
+            </div>
+            <div class="wow">
+              <table class="table" style="width:100%;">
+                <tr class="info">
+                  <td><strong>Time</strong></td>
+                  <td><strong>Session</strong></td>
+                  <td><strong>Speakers</strong></td>
+                </tr>
+                <!-- <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr> -->
+                <tr class="success">
+                  <td>{{tableData[currentCountry][0]}}</td>
+                  <td><strong>Opening Remarks</strong></td>
+                  <td>Organizers</td>
+                </tr>
+                <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+                <tr class="success">
+                  <td>{{tableData[currentCountry][1]}}</td>
+                  <td><strong>Geometric Deep Learning</strong></td>
+                  <td><a href="https://petar-v.com/" target="blank">Petar Veličković</a></td>
+                </tr>
+                <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+                <tr class="success">
+                  <td>{{tableData[currentCountry][2]}}</td>
+                  <td><strong>Building GNNs with Pytorch Geometric</strong></td>
+                  <td><a href="https://rusty1s.github.io/" target="blank">Matthias Fey</a></td>
+                </tr>
+                <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+                <tr class="success">
+                  <td>{{tableData[currentCountry][3]}}</td>
+                  <td><strong>Graph ML for Video Understanding</strong></td>
+                  <td><a href="https://www.bernardghanem.com/" target="blank">Bernard Ghanem</a></td>
+                </tr>
+                <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+                <tr class="success">
+                  <td>{{tableData[currentCountry][4]}}</td>
+                  <td><strong>20 Minutes Break</strong></td>
+                  <td></td>
+                </tr>
+                <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+
+                <tr class="success">
+                  <td>{{tableData[currentCountry][5]}}</td>
+                  <td><strong>Scene Graphs in 3D Vision</strong></td>
+                  <td><a href="http://campar.in.tum.de/Main/FedericoTombari" target="blank">Federico Tombari</a>& <a href="https://campar.in.tum.de/Main/FabianManhardt" target="blank">Fabian Manhardt</a></td>
+                </tr>
+                <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+                <tr class="success">
+                  <td>{{tableData[currentCountry][6]}}</td>
+                  <td><strong>Physion: Evaluating physical prediction from vision in humans and machines</strong></td>
+                  <td><a href="https://cogtoolslab.github.io/" target="blank">Judith Fan</a></td>
+                </tr>
+                <tr style="border-bottom:1px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+                <tr class="success">
+                  <td>{{tableData[currentCountry][7]}}</td>
+                  <td><strong>Hierarchical 3D Scene Understanding for Robotics: Real-time Algorithms and Performance Guarantees</strong></td>
+                  <td><a href="https://lucacarlone.mit.edu/" target="blank">Luca Carlone</a> & <a href="https://sites.google.com/view/rajat-talak" target="blank">Rajat Talak</a></td>
+                </tr>
+                <tr style="border-bottom:2px solid black">
+                  <td colspan="100%"></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+<!-- 
+<div id ="speakers" class="content-section-b">
+
+    <div class="container">
+
+        <div class="row">
+            <div class="container">
+
+                <div class="row wow "  data-animation-delay="200">
+                    <h3 class="section-heading">Invited Speakers</h3>
+                    <br>
+                </div>
+
+                <div class="row wow "  data-animation-delay="200">
+                    <div class="col-sm-3 wow"  data-animation-delay="200">
+                        <center><img  class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150" src="img/speakers/petar.jpg" alt=""></center>
+                        <h4 class="section-heading"><center><a href="https://petar-v.com/" target="blank">Petar Veličković</a></center></h4>
+                    </div>
+                    <div class="col-sm-8 col-md-offset-1 wow" style="text-align:justify" data-animation-delay="200">
+                        <p>Dr. Petar Veličković is a Staff Research Scientist at DeepMind, an Affiliated Lecturer at the University of Cambridge, and an Associate of Clare Hall, Cambridge. Petar holds a PhD in Computer Science from the University of Cambridge (Trinity College), obtained under the supervision of Pietro Liò. His research concerns geometric deep learning—devising neural network architectures that respect the invariances and symmetries in data. He is recognised as an ELLIS Scholar in the Geometric Deep Learning Program. Petar focuses on graph representation learning and its applications in algorithmic reasoning and computational biology. In particular, Petar is the first author of Graph Attention Networks (a popular convolutional layer for graphs)  and Deep Graph Infom (a popular self-supervised learning pipeline for graphs). His research has been used in substantially improving the travel-time predictions in Google Maps (featured in the CNBC, Endgadget, VentureBeat, CNET, the Verge and ZDNet), and guiding the intuition of mathematicians towards new top-tier theorems and conjectures (featured in Nature, New Scientist, The Independent, Sky News, The Sunday Times and The Conversation).</p>
+                    </div>
+                </div>
+                <p></p>
+
+                <div class="row wow "  data-animation-delay="200">
+                    <div class="col-sm-3 wow"  data-animation-delay="200">
+                        <center><img  class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150" src="img/speakers/federico.png" alt=""></center>
+                        <h4 class="section-heading"><center><a href="http://campar.in.tum.de/Main/FedericoTombari" target="blank">Federico Tombari</a></center></h4>
+                    </div>
+                    <div class="col-sm-8 col-md-offset-1 wow" style="text-align:justify" data-animation-delay="200">
+                        <p>Dr. Federico Tombari is a Senior Staff Research Scientist and manager at Google, where he leads an applied research team on computer vision and machine learning. He is also a Lecturer (PrivatDozent) at the Technical University of Munich (TUM). He has 200+ peer-reviewed publications in the field of 3D computer vision and machine learning and their applications to robotics, autonomous driving, healthcare and augmented reality. He got his PhD in 2009 from the University of Bologna and his Habilitation from TUM in 2018. In 2018-19 he was co-founder and managing director of Pointu3D, a Munich-based startup on 3D perception for AR and robotics. He regularly serves as Chair and Ass. Editor for international conferences and journals in the field (ECCV18, 3DV19, ICMVA19, 3DV20, IROS20, ICRA20, RA-L among others). He was the recipient, among others, of two Google Faculty Research Awards (in 2015 and 2018), an Amazon Research Award (in 2017), 2 CVPR Outstanding Reviewer Awards (2017, 2018). </p>
+                    </div>
+                </div>
+                <p></p>
+
+                <div class="row wow "  data-animation-delay="200">
+                    <div class="col-sm-3 wow"  data-animation-delay="200">
+                        <center><img  class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150" src="img/organizer/bernard.jpg" alt=""></center>
+                        <h4 class="section-heading"><center><a href="https://www.bernardghanem.com/" target="blank">Bernard Ghanem</a></center></h4>
+                    </div>
+                    <div class="col-sm-8 col-md-offset-1 wow" style="text-align:justify" data-animation-delay="200">
+                        <p>Dr. Bernard Ghanem is an Associate Professor of ECE and CS, theme leader at the Visual Computing Center, and Deputy Director of the AI Initiative at King Abdullah University of Science and Technology (KAUST) in Saudi Arabia. He has over 15 years of experience in computer vision with research interests spanning several topics including activity understanding in videos, 3D computer vision, and fundamentals of deep learning. Bernard has played an active role in the vision community as a workshop organizer (e.g. ActivityNet Workshop at CVPR 2016-2021), a tutorial organizer (CVPR 2013), a tutorial co-chair of ACCV 2016, Area Chair for CVPR 2018/2021/2022, ICCV 2019/2021, ICLR 2021, and AAAI 2021, and an Associate Editor for IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI) from 2021-present. </p>
+                    </div>
+                </div>
+                <p></p>
+
+                <div class="row wow "  data-animation-delay="200">
+                    <div class="col-sm-3 wow"  data-animation-delay="200">
+                        <center><img  class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150" src="img/speakers/matthias_fey.png" alt=""></center>
+                        <h4 class="section-heading"><center><a href="https://rusty1s.github.io/" target="blank">Matthias Fey</a></center></h4>
+                    </div>
+                    <div class="col-sm-8 col-md-offset-1 wow" style="text-align:justify" data-animation-delay="200">
+                        <p>Matthias Fey is a PhD student in Machine Learning on graphs at the TU Dortmund University. His main area of interest is the generalization of Deep Learning methods to arbitrary Euclidean and non-Euclidean structured data. He is passionate about new web technologies and community-driven open-source development. Matthias is an enthusiast for PyTorch, node.js, CSS, React, macOS, Arch Linux and Vim. The open sourced library, Pytorch Geometric, built by him, has become the most widely used library for graph neural networks. </p>
+                    </div>
+                </div>
+                <p></p>
+
+                <div class="row wow "  data-animation-delay="200">
+                    <div class="col-sm-3 wow"  data-animation-delay="200">
+                        <center><img  class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150" src="img/speakers/judith.jpg" alt=""></center>
+                        <h4 class="section-heading"><center><a href="https://cogtoolslab.github.io/" target="blank">Judith Fan</a></center></h4>
+                    </div>
+                    <div class="col-sm-8 col-md-offset-1 wow" style="text-align:justify" data-animation-delay="200">
+                        <p>Dr. Judith Fan is an Assistant Professor of Psychology at University of California, San Diego. Judith researches the intersection of cognitive science, computational neuroscience, and AI. Her recent investigations focus on human visual communication, which encompasses behaviors ranging from informal sketching to formal scientific visualization and its applications in education, user interface design, and assistive technologies. Judith builds computational models of such behaviors to understand how perception, memory, motor planning, and social cognition functionally interact in the brain, leading to a more unified understanding of how multiple cognitive systems are coordinated during complex, natural behaviors.</p>
+                    </div>
+                </div>
+                <p></p>
+
+                <div class="row wow "  data-animation-delay="200">
+                    <div class="col-sm-3 wow"  data-animation-delay="200">
+                        <center><img  class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150" src="img/speakers/luca.jpg" alt=""></center>
+                        <h4 class="section-heading"><center><a href="https://lucacarlone.mit.edu/" target="blank">Luca Carlone</a></center></h4>
+                    </div>
+                    <div class="col-sm-8 col-md-offset-1 wow" style="text-align:justify" data-animation-delay="200">
+                        <p>Dr. Luca Carlone is the Leonardo Career Development Associate Professor in the Department of Aeronautics and Astronautics at the Massachusetts Institute of Technology, a Principal Investigator in the MIT Laboratory for Information & Decision Systems (LIDS) and the director of the MIT SPARK Lab. Luca works at the cutting edge of robotics and autonomous systems research. His goal is to enable human-level perception and world understanding on mobile robotics platforms (drones, self-driving vehicles, ground robots) operating in the real world. His work involves a combination of rigorous theory and practical implementations,  including nonlinear estimation and probabilistic inference, numerical and distributed optimization, and geometric computer vision applied to sensing, perception, and decision-making in single and multi-robot systems.</p>
+                    </div>
+                </div>
+                <p></p>
+            </div>
+        </div>
+    </div>
+</div>
+ -->
+
+ <div id="speakers" class="content-section-b">
+    <div class="container">
+      <div class="row wow fadeInRightBig" data-animation-delay="200">
+        <h3 class="section-heading" style="text-align:justify;color:#164FC9">Speakers</h3>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/speakers/petar.jpg" alt=""></center>
+          <a href="https://petar-v.com/">
+            <h4 class="section-heading">
+              <center>Petar Veličković</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>DeepMind</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%"
+              src="img/speakers/matthias_fey.png" alt="" object-position="0 0"></center>
+          <a href="https://rusty1s.github.io/">
+            <h4 class="section-heading">
+              <center>Matthias Fey</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>KAUST</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%"
+              src="img/organizer/bernard.jpg" alt="" object-position="0 0"></center>
+          <a href="https://www.bernardghanem.com">
+            <h4 class="section-heading">
+              <center>Bernard Ghanem</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>KAUST</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/speakers/federico.png" alt=""></center>
+          <a href="http://campar.in.tum.de/Main/FedericoTombari">
+            <h4 class="section-heading">
+              <center>Federico Tombari</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>Google</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/speakers/fabian.png" alt=""></center>
+          <a href="https://cemse.kaust.edu.sa/people/person/jesus-zarzar">
+            <h4 class="section-heading">
+              <center>Fabian Manhardt</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>TUM</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/speakers/judith.jpg" alt=""></center>
+          <a href="https://cogtoolslab.github.io/">
+            <h4 class="section-heading">
+              <center>Judith Fan</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>UCSD</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/speakers/luca.jpg" alt=""></center>
+          <a href="https://lucacarlone.mit.edu/">
+            <h4 class="section-heading">
+              <center>Luca Carlone</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>MIT</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/speakers/rajat.jpg" alt=""></center>
+          <a href="https://sites.google.com/view/rajat-talak">
+            <h4 class="section-heading">
+              <center>Rajat Talak</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>Intel Labs</i></center>
+          </h5>
+        </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+  <div id="organizers" class="content-section-a">
+    <div class="container">
+      <div class="row wow fadeInRightBig" data-animation-delay="200">
+        <h3 class="section-heading" style="text-align:justify;color:#164FC9">Organizers</h3>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/organizer/guohaoli.jpg" alt=""></center>
+          <a href="http://www.ghli.org/">
+            <h4 class="section-heading">
+              <center>Guohao Li</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>KAUST</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/organizer/guochengqian.jpg" alt=""></center>
+          <a href="https://gcqian.com">
+            <h4 class="section-heading">
+              <center>Guocheng Qian</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>KAUST</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/organizer/jesus.png" alt=""></center>
+          <a href="https://cemse.kaust.edu.sa/people/person/jesus-zarzar">
+            <h4 class="section-heading">
+              <center>Jesus Zarzar</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>KAUST</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/organizer/silvio.png" alt=""></center>
+          <a href="https://silviogiancola.com">
+            <h4 class="section-heading">
+              <center>Silvio Giancola</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>KAUST</i></center>
+          </h5>
+        </div>
+      </div>
+      <div class="row wow fadeInRightBig animated animated" data-animation-delay="200" style="visibility: visible;">
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/organizer/ali.png" alt=""></center>
+          <a href="https://alithabet.com">
+            <h4 class="section-heading">
+              <center>Ali Thabet</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>Meta Reality Lab</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/organizer/matthias.png" alt=""></center>
+          <a href="https://matthias.pw/">
+            <h4 class="section-heading">
+              <center>Matthias Müller</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>Intel Labs</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%" height="150" width="150"
+              src="img/organizer/federico.png" alt=""></center>
+          <a href="https://www.in.tum.de/campar/members/senior-research-scientists/federico-tombari/">
+            <h4 class="section-heading">
+              <center>Federico Tombari</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>Google</i></center>
+          </h5>
+        </div>
+        <div class="col-sm-3 wow fadeInRightBig" data-animation-delay="200">
+          <center><img class="img-responsive img-rounded" style="border-radius: 50%"
+              src="img/organizer/bernard.jpg" alt="" object-position="0 0"></center>
+          <a href="https://www.bernardghanem.com">
+            <h4 class="section-heading">
+              <center>Bernard Ghanem</center>
+            </h4>
+          </a>
+          <h5 class="section-heading">
+            <center><i>KAUST</i></center>
+          </h5>
+        </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!--  collaborator  -->
+  <!-- <div id="collaborator" class="content-section-a">
+    <div class="container">
+      <div class="row wow fadeInRightBig animated animated" data-animation-delay="200" style="visibility: visible;">
+        <h3 class="section-heading" style="text-align:justify;color:#164FC9">Collaborator</h3>
+        <a href="https://www.4paradigm.com/"><img src="img/第四范式logo.svg" style="display:block;width:25%"></a>
+      </div>
+    </div>
+  </div>
+ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!-- /.container -->
+
+
+
+
+  <div id="contact" class="content-section-c ">
+    <!-- Contacts -->
+    <div class="container">
+      <div class="row">
+        <div class="wow" data-animation-delay="200">
+          <div class="title lead3" style="text-align:center;color:white;font-size:24px">
+            Contact:  guohao.li@kaust.edu.sa
+          </div>
+          <div class="sub-title lead3" style="text-align:center;color:white">
+            CVPR 2022 Tutorial ©2022
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- JavaScript -->
+  <script src="js/jquery-1.10.2.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script src="js/owl.carousel.js"></script>
+  <script src="js/script.js"></script>
+  <!-- StikyMenu -->
+  <script src="js/stickUp.min.js"></script>
+  <script type="text/javascript">
+    jQuery(function ($) {
+      $(document).ready(function () {
+        $('.navbar-default').stickUp();
+
+      });
+    });
+  </script>
+
+  <script>
+    var app = new Vue({
+      el: '#controller',
+      data: {
+        country: ['Central Daylight Time (CDT)'],
+        currentCountry: 0,
+        tableData: [
+          ['1:00pm-1:10pm', '1:10pm-1:50pm', '1:50pm-2:30pm', '2:30pm-3:10pm', '3:10pm-3:30pm','3:30pm-4:10pm','4:10pm-4:50pm', '4:50pm-5:30pm'],
+        ]
+      },
+      methods: {
+        changeIndex(i) {
+          this.currentCountry = i
+        }
+      }
+    })
+  </script>
+  <!-- Smoothscroll -->
+  <script type="text/javascript" src="js/jquery.corner.js"></script>
+  <script src="js/wow.min.js"></script>
+  <script>
+    new WOW().init();
+  </script>
+  <script src="js/classie.js"></script>
+  <script src="js/uiMorphingButton_inflow.js"></script>
+  <!-- Magnific Popup core JS file -->
+  <script src="js/jquery.magnific-popup.js"></script>
+</body>
+
+</html>
+
+<style>
+  .title {
+    width: 100%;
+  }
+
+  .titleItem {
+    margin-right: 40px;
+    font-size: 15px;
+  }
+
+  .titleItemSelect {
+    margin-right: 40px;
+    color: #1abc9c;
+    font-weight: 600;
+    font-size: 15px;
+
+  }
+</style>
